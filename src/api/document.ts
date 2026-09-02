@@ -1,15 +1,15 @@
 import http from "./http";
 import type { DocumentConfig } from "@/types";
 
-/** 文档访问配置列表 */
+/** 文档配置列表 */
 export function listDocuments() {
   return http.get<DocumentConfig[]>("/documents");
 }
 
-/** 更新文档可访问角色/部门（后端会立即重新索引该文档） */
+/** 更新文档部门（后端会立即重新索引该文档） */
 export function updateDocument(
   id: number,
-  data: { allowedRoleIds: number[]; department?: string | null }
+  data: { department?: string | null }
 ) {
   return http.put<DocumentConfig>(`/documents/${id}`, data);
 }

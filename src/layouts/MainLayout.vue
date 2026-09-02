@@ -16,8 +16,8 @@
           <span>角色管理</span>
         </el-menu-item>
         <el-menu-item v-if="isAdmin" index="/documents">
-          <el-icon><Lock /></el-icon>
-          <span>文档权限</span>
+          <el-icon><Folder /></el-icon>
+          <span>文档管理</span>
         </el-menu-item>
       </el-menu>
     </el-aside>
@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ChatDotRound, User, Key, Lock } from "@element-plus/icons-vue";
+import { ChatDotRound, User, Key, Folder } from "@element-plus/icons-vue";
 import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();

@@ -20,7 +20,6 @@ export interface DocumentConfig {
   id: number;
   source: string;
   department: string | null;
-  allowedRoleIds: number[] | null;
   created_at: string;
   updated_at: string;
 }
