@@ -1,6 +1,6 @@
 # 企业知识库前端（knowledge-base-frontend）
 
-企业知识库系统的前端工程，提供登录认证、**智能问答**、人员管理、角色管理四大模块。问答支持流式输出、Markdown 渲染与历史记录分页加载。后端位于同级目录 [`../enterprise-knowledge-base`](../enterprise-knowledge-base)。
+企业知识库系统的前端工程，提供登录认证、**智能问答**、人员管理、角色管理、文档管理五大模块。问答支持流式输出、Markdown 渲染与历史记录分页加载。后端位于同级目录 [`../enterprise-knowledge-base`](../enterprise-knowledge-base)。
 
 ---
 
@@ -27,7 +27,8 @@ src/
 │   ├── auth.ts           #   登录
 │   ├── chat.ts           #   问答流式 + 历史记录分页
 │   ├── user.ts           #   人员管理 CRUD
-│   └── role.ts           #   角色管理 CRUD
+│   ├── role.ts           #   角色管理 CRUD
+│   └── document.ts       #   文档管理（列表 / 部门更新 / 重建索引）
 ├── stores/
 │   └── auth.ts           # Pinia：token / user 的读写与持久化
 ├── router/
@@ -38,7 +39,8 @@ src/
 │   ├── login/            # 登录页
 │   ├── chat/             # 智能问答页（核心）
 │   ├── users/            # 人员管理页
-│   └── roles/            # 角色管理页
+│   ├── roles/            # 角色管理页
+│   └── documents/        # 文档管理页
 ├── components/           # 问答页拆分出的子组件
 │   ├── ChatMessage.vue   #   单条消息（头像 + Markdown + 加载动画）
 │   └── ChatInput.vue     #   输入框（自适应高度 + 发送按钮）
@@ -75,8 +77,8 @@ src/
 ### 3.3 认证与权限（RBAC）
 
 - 登录成功后 JWT 与用户信息写入 `localStorage`（key 为 `token`、`user`），由 [`src/stores/auth.ts`](src/stores/auth.ts) 管理。
-- [`src/router/index.ts`](src/router/index.ts) 的全局前置守卫：`public` 路由放行；未登录跳登录；`admin` 路由校验 `user.role === 'admin'`，非管理员跳问答页。
-- 侧边栏菜单（[`MainLayout.vue`](src/layouts/MainLayout.vue)）按 `isAdmin` 计算属性动态显隐「人员管理/角色管理」。
+- [`src/router/index.ts`](src/router/index.ts) 的全局前置守卫：`public` 路由放行；未登录跳登录；`admin` 路由校验 `user.roleName === 'admin'`，非管理员跳问答页。
+- 侧边栏菜单（[`MainLayout.vue`](src/layouts/MainLayout.vue)）按 `isAdmin` 计算属性动态显隐「人员管理/角色管理/文档管理」。
 
 ---
 
@@ -87,7 +89,8 @@ src/
 | 登录 | `/login` | 手机号/邮箱 + 密码，成功后跳 `/chat` |
 | 智能问答 | `/chat` | 流式问答、Markdown 渲染、历史分页加载 |
 | 人员管理 | `/users` | 用户 CRUD（仅 admin） |
-| 角色管理 | `/roles` | 角色 CRUD + 敏感度权限（仅 admin） |
+| 角色管理 | `/roles` | 角色 CRUD（仅 admin） |
+| 文档管理 | `/documents` | 文档列表、部门覆盖、重建全部索引（仅 admin） |
 
 ---
 
@@ -182,5 +185,7 @@ pnpm build
 | GET | `/api/qa/history` | 历史分页 `?limit&before` → `{ messages, hasMore }` |
 | GET/POST/PUT/DELETE | `/api/users` | 人员管理（admin） |
 | GET/POST/PUT/DELETE | `/api/roles` | 角色管理（admin） |
+| GET/PUT | `/api/documents` | 文档管理（admin） |
+| POST | `/api/documents/reindex-all` | 重建全部索引（admin） |
 
-> 后端认证用 `Authorization: Bearer <JWT>`，JWT 载荷含 `{ id, role }`；`/api/qa` 需登录 + 权限过滤，`/api/users`、`/api/roles` 还需 admin。
+> 后端认证用 `Authorization: Bearer <JWT>`，JWT 载荷含 `{ id }`；`/api/qa` 需登录即可（文档对所有人开放），`/api/users`、`/api/roles`、`/api/documents` 还需 admin。
